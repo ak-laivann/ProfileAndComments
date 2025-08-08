@@ -5,9 +5,9 @@ import { ProfileRoutes } from "./Profile.routes";
 export const RootRouter = () => {
   return (
     <Routes>
-      <Route index element={<Navigate to={"/comments/all"} />} />
+      <Route index element={<Navigate to={"/profile/"} />} />
       <Route path="/comments/*" element={<CommentsRoutes />} />
-      <Route path="/profile/*" element={<ProfileRoutes />} />
+      <Route index path="/profile/*" element={<ProfileRoutes />} />
     </Routes>
   );
 };

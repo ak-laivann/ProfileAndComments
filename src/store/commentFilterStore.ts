@@ -1,8 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-type SortColumn = "postId" | "name" | "email" | null;
-type SortDirection = "none" | "asc" | "desc";
+import { SortColumn, SortDirection } from "../props";
 
 interface CommentFilterStore {
   searchQuery: string;
@@ -10,7 +8,11 @@ interface CommentFilterStore {
   sortDirection: SortDirection;
   setSearchQuery: (query: string) => void;
   toggleSort: (column: SortColumn) => void;
+  currentPage: number;
+  setPage: (page: number) => void;
   clearSort: () => void;
+  pageSize: number;
+  setPageSize: (size: number) => void;
 }
 
 export const useCommentFilterStore = create<CommentFilterStore>()(
@@ -19,28 +21,36 @@ export const useCommentFilterStore = create<CommentFilterStore>()(
       searchQuery: "",
       sortColumn: null,
       sortDirection: "none",
-
-      setSearchQuery: (query) => set({ searchQuery: query }),
+      currentPage: 1,
+      setSearchQuery: (query) => set({ searchQuery: query, currentPage: 1 }),
+      pageSize: 10,
+      setPageSize: (size) => set({ pageSize: size, currentPage: 1 }),
 
       toggleSort: (column) => {
         const { sortColumn, sortDirection } = get();
-
         if (sortColumn !== column) {
-          set({ sortColumn: column, sortDirection: "asc" });
+          set({ sortColumn: column, sortDirection: "asc", currentPage: 1 });
         } else {
           const next = getNextSortDirection(sortDirection);
           set({
             sortDirection: next,
             sortColumn: next === "none" ? null : column,
+            currentPage: 1,
           });
         }
       },
 
-      clearSort: () => set({ sortColumn: null, sortDirection: "none" }),
+      clearSort: () =>
+        set({
+          sortColumn: null,
+          sortDirection: "none",
+          searchQuery: "",
+          currentPage: 1,
+        }),
+
+      setPage: (page) => set({ currentPage: page }),
     }),
-    {
-      name: "comment-filter-store",
-    }
+    { name: "comment-filter-store" }
   )
 );
 
